@@ -27,10 +27,15 @@ async def main():
     board = Board.from_robot(robot, 'pi')
     sensor_pin = await board.gpio_pin_by_name('37')
 
+    move_count = 0
     while True:
         pin_status = await sensor_pin.get()
         if pin_status == False:
-            await stepper.go_for(rpm=40,revolutions=.1)
+            await stepper.go_for(rpm=80,revolutions=.1)
+            move_count = move_count + 1
+            if move_count % 10 == 0:
+                # try to break any jams
+                await stepper.go_for(rpm=150,revolutions=-.2) 
         time.sleep(.2)
 
 

@@ -30,6 +30,7 @@ async def main():
     move_count = 0
     while True:
         pin_status = await sensor_pin.get()
+        # pin status is False if it senses something close to it
         if pin_status == False:
             await stepper.go_for(rpm=80,revolutions=.1)
             move_count = move_count + 1

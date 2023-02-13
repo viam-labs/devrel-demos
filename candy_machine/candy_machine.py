@@ -1,9 +1,11 @@
 import asyncio
 import os
+import time
 
 from viam.robot.client import RobotClient
 from viam.rpc.dial import Credentials, DialOptions
-from viam.components.base import Base
+from viam.components.motor import Motor
+from viam.components.board import Board
 
 robot_secret = os.getenv('ROBOT_SECRET') or ''
 robot_address = os.getenv('ROBOT_ADDRESS') or ''
@@ -18,23 +20,19 @@ async def connect():
     )
     return await RobotClient.at_address(robot_address, opts)
 
-async def moveInSquare(base):
-    for _ in range(4):
-        # moves the Viam Rover forward 500mm at 500mm/s
-        await base.move_straight(velocity=500, distance=500)
-        print("move straight")
-        # spins the Viam Rover 90 degrees at 100 degrees per second
-        await base.spin(velocity=100, angle=90)
-        print("spin 90 degrees")
-
 async def main():
     robot = await connect()
-    roverBase = Base.from_robot(robot, 'viam_base')
 
-    print('Resources:')
-    print(robot.resource_names)
+    stepper = Motor.from_robot(robot, 'stepper')
+    board = Board.from_robot(robot, 'pi')
+    sensor_pin = await board.gpio_pin_by_name('37')
 
-    await moveInSquare(roverBase)
+    while True:
+        pin_status = await sensor_pin.get()
+        if pin_status == False:
+            await stepper.go_for(rpm=40,revolutions=.1)
+        time.sleep(.2)
+
 
     await robot.close()
 

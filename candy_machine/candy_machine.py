@@ -7,6 +7,7 @@ from viam.rpc.dial import Credentials, DialOptions
 from viam.components.motor import Motor
 from viam.components.board import Board
 
+# these must be set, you can get them from your robot's 'CODE SAMPLE' tab
 robot_secret = os.getenv('ROBOT_SECRET') or ''
 robot_address = os.getenv('ROBOT_ADDRESS') or ''
 
@@ -23,6 +24,7 @@ async def connect():
 async def main():
     robot = await connect()
 
+    # update these based on how you named your stepper, board, and how you wired your sensor
     stepper = Motor.from_robot(robot, 'stepper')
     board = Board.from_robot(robot, 'pi')
     sensor_pin = await board.gpio_pin_by_name('37')

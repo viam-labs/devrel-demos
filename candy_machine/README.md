@@ -34,4 +34,4 @@ It expects a GPIO sensor to be attached to pin 37, and the following robot confi
 }
 ```
 
-Note that the environment variables ROBOT_SECRET and ROBOT_ADDRESS are expected to be set.
+Note that the environment variables ROBOT_SECRET and ROBOT_ADDRESS are expected to be set - these can be retrieved from your robot's 'CODE SAMPLE' tab

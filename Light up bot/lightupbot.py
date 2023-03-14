@@ -74,7 +74,7 @@ async def main():
             state = "on"
         else:
             print("There's nobody here")
-            # Put the code here to turn off the smart plug
+            # Turn off the smart plug
             await plug.turn_off()
             await plug.update()
             print("turning off")

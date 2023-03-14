@@ -23,7 +23,6 @@ Project asks for the smart plug to be attached to the light source (desk lamp in
       "attributes": {},
         "path": "change-this-with-your-own-camera-path"
       }
-    }
   ]
 }
 ```

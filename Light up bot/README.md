@@ -1,6 +1,12 @@
 # Light up bot
 
-This script configures an object detection robot using Viam. Hardware that are required: your computer with a webcam, a Kasa Smart Plug, and a desk lamp. This robot will be able to turn the lights on/off when it detects a person in front of it.
+This script configures an object detection robot using Viam. 
+Required hardware:
+- A computer with a webcam
+- A Kasa Smart Plug
+- A desk lamp.
+
+This robot will be able to turn the lights on/off when it detects a person in front of it.
 
 As you get and set up the vision service params, you have to change the “model_path” to where you tflite package lives, and the “label_path” to where your text file lives.
 

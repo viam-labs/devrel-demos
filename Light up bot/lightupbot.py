@@ -1,4 +1,5 @@
 import asyncio
+import os
 
 from viam.robot.client import RobotClient
 from viam.rpc.dial import Credentials, DialOptions
@@ -8,19 +9,21 @@ from viam.services.vision import VisionServiceClient, VisModelConfig, VisModelTy
 from PIL import ImageDraw
 from kasa import Discover, SmartPlug
 
-ROBOT_URL = 'PUT YOUR URL HERE!!!'
-ROBOT_SECRET = 'PUT YOUR SECRET HERE!!!'
+#these must be set, you can get them from your robot's 'CODE SAMPLE' tab
+robot_secret = os.getenv('ROBOT_SECRET') or ''
+robot_address = os.getenv('ROBOT_ADDRESS') or ''
 
 async def connect():
     creds = Credentials(
         type='robot-location-secret',
-        payload=ROBOT_SECRET)
+        payload=robot_secret)
     opts = RobotClient.Options(
         refresh_interval=0,
         dial_options=DialOptions(credentials=creds)
     )
-    return await RobotClient.at_address(ROBOT_URL, opts)
+    return await RobotClient.at_address(robot_address, opts)
 
+#for displaying your detections with a red box around them, if needed
 def drawBox(d, frame):
   rect = [d.x_min, d.y_min, d.x_max, d.y_max]
   img1 = ImageDraw.Draw(frame)
@@ -36,9 +39,10 @@ async def main():
     camera = Camera.from_robot(robot, "camera")
     image = await camera.get_image()
 
-    # Get and setup vision service
+    #get and setup vision service
+    #replace the "model_path" to where your tflite package lives, and "label_path" to where your text file lives on the robot. 
     vision = VisionServiceClient.from_robot(robot)
-    params = {"model_path": "/Users/hazalmestci/Downloads/effdet0.tflite", "label_path": "/Users/hazalmestci/Downloads/labels.txt", "num_threads": 1}
+    params = {"model_path": "/location/of/tflite/effdet0.tflite", "label_path": "/location/of/labels/labels.txt", "num_threads": 1}
     personDet = VisModelConfig(name="person_detector", type=VisModelType("tflite_detector"), parameters=params)
     await vision.add_detector(personDet)
     names = await vision.get_detector_names()
@@ -60,21 +64,22 @@ async def main():
             if d.confidence > 0.8:
                 print(d)
                 print()
-                # image = drawBox(d, image)
-                # image.show()
+                #you can use the below code for testing
+                #image = drawBox(d, image)
+                #image.show()
                 if d.class_name.lower() == "person":
                     print("This is a person!")
                     found = True
              
         if found:
-            # Turn on the smart plug
+            #turn on the smart plug
             await plug.turn_on()
             await plug.update()
             print("turning on")
             state = "on"
         else:
             print("There's nobody here")
-            # Turn off the smart plug
+            #turn off the smart plug
             await plug.turn_off()
             await plug.update()
             print("turning off")

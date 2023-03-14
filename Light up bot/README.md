@@ -1,11 +1,10 @@
 # Light up bot
 
-This script configures 
+This script configures an object detection robot using Viam. Hardware that are required: your computer with a webcam, a Kasa Smart Plug, and a desk lamp. This robot will be able to turn the lights on/off when it detects a person in front of it.
 
-an ultrasonic sensor to avoid walls and obstacles (via a sensor such as [ultrasonic sensor](https://www.amazon.com/Dorhea-Ultrasonic-Distance-Duemilanove-Rapsberry/dp/B07L68X65N/ref=sr_1_3?)).
-It was created for [this workshop prompt](https://docs.google.com/document/d/1YTm0KlSHBQdgexX9Wt-B6mEeOzzF53plqihrrNkCc1M/edit).
+As you get and set up the vision service params, you have to change the “model_path” to where you tflite package lives, and the “label_path” to where your text file lives.
 
-It expects an kasa smart plug to be attached to a light source, and the following robot configuration in Viam app:
+It also expects the smart plug to be attached to the light source (desk lamp in this case), and the following robot configuration in Viam app:
 
 ``` json
 {

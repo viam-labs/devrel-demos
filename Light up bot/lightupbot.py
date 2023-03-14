@@ -67,7 +67,7 @@ async def main():
                     found = True
              
         if found:
-            # Put the code here to turn on the smart plug
+            # Turn on the smart plug
             await plug.turn_on()
             await plug.update()
             print("turning on")

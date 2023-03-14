@@ -40,9 +40,8 @@ async def main():
     image = await camera.get_image()
 
     #get and setup vision service
-    #replace the "model_path" to where your tflite package lives, and "label_path" to where your text file lives on the robot. 
     vision = VisionServiceClient.from_robot(robot)
-    params = {"model_path": "/location/of/tflite/effdet0.tflite", "label_path": "/location/of/labels/labels.txt", "num_threads": 1}
+    params = {"model_path": "./effdet0.tflite", "label_path": "./labels.txt", "num_threads": 1}
     personDet = VisModelConfig(name="person_detector", type=VisModelType("tflite_detector"), parameters=params)
     await vision.add_detector(personDet)
     names = await vision.get_detector_names()

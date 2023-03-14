@@ -8,7 +8,7 @@ Required hardware:
 
 This robot will be able to turn the lights on/off when it detects a person in front of it.
 
-As you get and set up the vision service params, you have to change the “model_path” to where you tflite package lives, and the “label_path” to where your text file lives.
+As you get and set up the vision service params, you have to change the `model_path` to where you tflite package lives, and the `label_path` to where your text file lives.
 
 It also expects the smart plug to be attached to the light source (desk lamp in this case), and the following robot configuration in Viam app:
 

@@ -20,28 +20,7 @@ It also expects the smart plug to be attached to the light source (desk lamp in 
       "model": "webcam",
       "name": "camera",
       "type": "camera",
-      "attributes": {
-        "debug": false,
-        "height_px": 0,
-        "path_pattern": "",
-        "width_px": 0,
-        "intrinsic_parameters": {
-          "width_px": 0,
-          "fx": 0,
-          "fy": 0,
-          "height_px": 0,
-          "ppx": 0,
-          "ppy": 0
-        },
-        "stream": "",
-        "format": "",
-        "distortion_parameters": {
-          "rk1": 0,
-          "rk2": 0,
-          "rk3": 0,
-          "tp1": 0,
-          "tp2": 0
-        },
+      "attributes": {},
         "path": "change-this-with-your-own-camera-path"
       }
     }

@@ -18,7 +18,7 @@ Project asks for the smart plug to be attached to the light source (desk lamp in
      {
       "depends_on": [],
       "model": "webcam",
-      "name": "camera-cam",
+      "name": "camera-mac",
       "type": "camera",
       "attributes": {},
         "path": "change-this-with-your-own-camera-path"

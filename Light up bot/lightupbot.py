@@ -35,8 +35,8 @@ async def main():
 
     print('Resources:')
     print(robot.resource_names)
-
-    camera = Camera.from_robot(robot, "camera")
+    #this string should match up your component name in Viam app
+    camera = Camera.from_robot(robot, "camera-mac")
     image = await camera.get_image()
 
     #get and setup vision service

@@ -9,7 +9,7 @@ from viam.services.vision import VisionServiceClient, VisModelConfig, VisModelTy
 from PIL import ImageDraw
 from kasa import Discover, SmartPlug
 
-#these must be set, you can get them from your robot's 'CODE SAMPLE' tab
+# These must be set, you can get them from your robot's 'CODE SAMPLE' tab
 robot_secret = os.getenv('ROBOT_SECRET') or ''
 robot_address = os.getenv('ROBOT_ADDRESS') or ''
 
@@ -35,11 +35,11 @@ async def main():
 
     print('Resources:')
     print(robot.resource_names)
-    #this string should match up your component name in Viam app
-    camera = Camera.from_robot(robot, "camera-mac")
+    # This string should match your camera component name in your robot config on the Viam app
+    camera = Camera.from_robot(robot, "my-camera")
     image = await camera.get_image()
 
-    #get and setup vision service
+    # Get and set up the Vision Service
     vision = VisionServiceClient.from_robot(robot)
     params = {"model_path": "./effdet0.tflite", "label_path": "./labels.txt", "num_threads": 1}
     personDet = VisModelConfig(name="person_detector", type=VisModelType("tflite_detector"), parameters=params)

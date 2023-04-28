@@ -12,6 +12,7 @@ robot_secret = os.getenv('ROBOT_SECRET') or ''
 robot_address = os.getenv('ROBOT_ADDRESS') or ''
 base_name = os.getenv('ROBOT_BASE') or 'viam_base'
 camera_name = os.getenv('ROBOT_CAMERA') or 'face-cam'
+pause_interval = os.getenv('PAUSE_INTERVAL') or 5
 
 base_state = "stopped"
 
@@ -65,7 +66,7 @@ async def person_detect(detector, sensor, base):
             await base.spin(90, 90)
             base_state = "stopped"
 
-        await asyncio.sleep(5)
+        await asyncio.sleep(pause_interval)
 
 async def main():
     robot = await connect()

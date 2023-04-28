@@ -23,10 +23,10 @@ async def connect():
 
 async def main():
     robot = await connect()
-    #initilazing rover base, the name between '' has to match the config component name
+    #initializing rover base, the name between '' has to match the config component name
     base = Base.from_robot(robot, 'viam_base')
 
-    #initilazing ultrasonic sensor, the name between '' has to match the config component name
+    #initializing ultrasonic sensor, the name between '' has to match the config component name
     sensor = Sensor.from_robot(robot, "ultrasonic")
 
     for i in range(1000): 

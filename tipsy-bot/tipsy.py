@@ -57,7 +57,7 @@ async def person_detect(detector, sensor, sensor2, base):
                     found = True
         if (found):
             print("I see a person")
-            # first manually call obstacle_detect - don't even start moving if someone in the way
+            # first manually call obstacle_detect - don't even start moving if someone is in the way
             distance = await obstacle_detect(sensor)
             distance2 = await obstacle_detect(sensor2)
             if (distance > .4 or distance2 > .4):

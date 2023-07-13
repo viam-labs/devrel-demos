@@ -33,8 +33,8 @@ async def main():
     await plug.turn_off()
     state = "off"
     for i in range(N):
-# make sure that your camera name in the app matches "my-camera"       
-         detections = await detector.get_detections_from_camera("my-camera")
+        #make sure that your camera name in the app matches "my-camera"       
+        detections = await detector.get_detections_from_camera("my-camera")
         found = False
         for d in detections:
             if d.confidence > 0.8:
@@ -49,7 +49,7 @@ async def main():
             print("turning on")
             state = "on"
         else:
-            print("There's nobody here")
+            print("there's nobody here")
             #turn off the smart plug
             await plug.turn_off()
             await plug.update()

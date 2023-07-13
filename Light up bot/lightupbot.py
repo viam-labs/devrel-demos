@@ -3,10 +3,7 @@ import os
 
 from viam.robot.client import RobotClient
 from viam.rpc.dial import Credentials, DialOptions
-from viam.components.camera import Camera
-from viam.components.types import CameraMimeType
 from viam.services.vision import VisionClient, VisModelConfig, VisModelType, Detection
-from PIL import ImageDraw
 from kasa import Discover, SmartPlug
 
 # These must be set, you can get them from your robot's 'CODE SAMPLE' tab
@@ -26,8 +23,6 @@ async def connect():
 async def main():
     robot = await connect()
 
-    # This string should match your camera component name in your robot config on the Viam app
-    camera = Camera.from_robot(robot, "my-camera")
     detector = VisionClient.from_robot(robot, "myPeopleDetector")
 
     N = 100
@@ -38,7 +33,8 @@ async def main():
     await plug.turn_off()
     state = "off"
     for i in range(N):
-        detections = await detector.get_detections_from_camera("my-camera")
+# make sure that your camera name in the app matches "my-camera"       
+         detections = await detector.get_detections_from_camera("my-camera")
         found = False
         for d in detections:
             if d.confidence > 0.8:

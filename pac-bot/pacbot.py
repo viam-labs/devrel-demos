@@ -61,7 +61,7 @@ async def ghost_detect(detector, sensor, base, ao):
         action = ""
         global base_state
         print("will detect")
-        detections = await detector.get_detections_from_camera(camera_name=camera_name)
+        detections = await detector.get_detections_from_camera(camera_name=camera_name,timeout=10)
         print("got detections")
         for d in detections:
             if d.confidence > .7:
@@ -87,11 +87,10 @@ async def ghost_detect(detector, sensor, base, ao):
         elif (action == "chase"):
             await stop_sound(ao)
             await play_sound(ao, 'power_pellet.wav', 0, True)
-            await play_sound(ao, 'retreating.wav', 0, True)
+            await play_sound(ao, 'retreating.wav', 0, False)
             print("I need to run from the ghost")
             # first manually call obstacle_detect - don't even start moving if something is in the way
             distance = await obstacle_detect(sensor)
-            distance2 = await obstacle_detect(sensor2)
             if (distance > .4 or distance2 > .4):
                 base_state = "straight"
                 await base.move_straight(distance=800, velocity=350)

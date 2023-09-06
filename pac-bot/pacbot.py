@@ -45,24 +45,24 @@ async def obstacle_detect(sensor):
     reading = (await sensor.get_readings())["distance"]
     return reading 
 
-async def obstacle_detect_loop(sensor, sensor2, base):
+async def obstacle_detect_loop(sensor, base):
     while(True):
         reading = await obstacle_detect(sensor)
-        reading2 = await obstacle_detect(sensor2)
-        if reading < 0.4 or reading2 <0.4:
+        if reading < 0.4:
             # stop the base if moving straight
             if base_state == "straight":
                 await base.stop()
                 print("obstacle in front")
         await asyncio.sleep(.01)
 
-async def ghost_detect(detector, sensor, sensor2, base, ao):
+async def ghost_detect(detector, sensor, base, ao):
     while(True):
         # look for person
         action = ""
         global base_state
         print("will detect")
-        detections = await detector.get_detections_from_camera(camera_name)
+        detections = await detector.get_detections_from_camera(camera_name=camera_name)
+        print("got detections")
         for d in detections:
             if d.confidence > .7:
                 print(d.class_name)
@@ -78,10 +78,9 @@ async def ghost_detect(detector, sensor, sensor2, base, ao):
             print("I need to run from the ghost")
             # first manually call obstacle_detect - don't even start moving if something is in the way
             distance = await obstacle_detect(sensor)
-            distance2 = await obstacle_detect(sensor2)
-            if (distance > .4 or distance2 > .4):
+            if (distance > .4):
                 base_state = "spinning"
-                await base.spin(180, 45)
+                await base.spin(180, 90)
                 base_state = "straight"
                 await base.move_straight(distance=800, velocity=250)
                 base_state = "stopped"
@@ -98,29 +97,31 @@ async def ghost_detect(detector, sensor, sensor2, base, ao):
                 await base.move_straight(distance=800, velocity=350)
                 base_state = "stopped"
         else:
+            await stop_sound(ao)
+            await play_sound(ao, 'pacman_chomp.wav', 0, True)
             print("I will turn then go straight")
             base_state = "spinning"
-            await base.spin(45, 45)
+            await base.spin(45, 90)
             base_state = "straight"
             await base.move_straight(distance=400, velocity=250)
             base_state = "stopped"
 
+        print("Will sleep")
         await asyncio.sleep(pause_interval)
 
 async def main():
     robot = await connect()
     base = Base.from_robot(robot, base_name)
     sensor = Sensor.from_robot(robot, "ultrasonic")
-    sensor2= Sensor.from_robot(robot, "ultrasonic2")
     detector = VisionClient.from_robot(robot, detector_name)
     ao = Audioout.from_robot(robot, name="audioout")
 
     await play_sound(ao, 'game_start.wav', 0, True)
 
     # create a background task that looks for obstacles and stops the base if its moving
-    obstacle_task = asyncio.create_task(obstacle_detect_loop(sensor, sensor2, base))
+    obstacle_task = asyncio.create_task(obstacle_detect_loop(sensor, base))
     # create a background task that looks for a ghost runs from a purple one, chases a cyan one, or turns and goes straight
-    ghost_task = asyncio.create_task(ghost_detect(detector, sensor, sensor2, base, ao))
+    ghost_task = asyncio.create_task(ghost_detect(detector, sensor, base, ao))
 
     results= await asyncio.gather(obstacle_task, ghost_task, return_exceptions=True)
     print(results)

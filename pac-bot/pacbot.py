@@ -1,6 +1,7 @@
 import asyncio
 import os
 import time
+import threading
 
 from src.audioout import Audioout
 from viam.robot.client import RobotClient
@@ -33,14 +34,15 @@ async def connect():
     return await RobotClient.at_address(robot_address, opts)
 
 async def play_sound(ao, filename, loop_count, block):
-    if block:
-        await ao.play("sounds/" + filename, loop_count, 0, 0)
-    else:
-        asyncio.create_task(ao.play("sounds/" + filename, loop_count, 0, 0))
+    print("starting play sound " + filename)
+    await ao.play("sounds/" + filename, loop_count, 0, 0, block)
+    print("done play sound " + filename)
 
 async def stop_sound(ao):
+    print("stopping sound")
     await ao.stop()
-    
+    print("done stopping sound")
+
 async def obstacle_detect(sensor):
     reading = (await sensor.get_readings())["distance"]
     return reading 
@@ -72,7 +74,7 @@ async def ghost_detect(detector, sensor, base, ao):
         
         if (action == "run"):
             await stop_sound(ao)
-            await play_sound(ao, 'siren_1.wav', 20, False)
+            await play_sound(ao, 'siren_1.wav', 10, False)
 
             print("I need to run from the ghost")
             # first manually call obstacle_detect - don't even start moving if something is in the way
@@ -96,7 +98,7 @@ async def ghost_detect(detector, sensor, base, ao):
                 base_state = "stopped"
         else:
             await stop_sound(ao)
-            await play_sound(ao, 'pacman_chomp.wav', 0, True)
+            await play_sound(ao, 'pacman_chomp.wav', 0, False)
             print("I will turn then go straight")
             base_state = "spinning"
             await base.spin(45, 90)
@@ -114,6 +116,7 @@ async def main():
     detector = VisionClient.from_robot(robot, detector_name)
     ao = Audioout.from_robot(robot, name="audioout")
 
+    await stop_sound(ao)
     await play_sound(ao, 'game_start.wav', 0, True)
 
     # create a background task that looks for obstacles and stops the base if its moving

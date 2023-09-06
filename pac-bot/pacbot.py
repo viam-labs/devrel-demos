@@ -57,7 +57,6 @@ async def obstacle_detect_loop(sensor, base):
 
 async def ghost_detect(detector, sensor, base, ao):
     while(True):
-        # look for person
         action = ""
         global base_state
         print("will detect")
@@ -88,7 +87,7 @@ async def ghost_detect(detector, sensor, base, ao):
             await stop_sound(ao)
             await play_sound(ao, 'power_pellet.wav', 0, True)
             await play_sound(ao, 'retreating.wav', 0, False)
-            print("I need to run from the ghost")
+            print("I need chase the ghost")
             # first manually call obstacle_detect - don't even start moving if something is in the way
             distance = await obstacle_detect(sensor)
             if (distance > .4 or distance2 > .4):

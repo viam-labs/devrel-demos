@@ -1,6 +1,6 @@
 # Pac-bot
 
-This script is derived from the [Tipsy tutorial](https://docs.viam.com/tutorials/projects/tipsy/), but uses a custom "ghost" detector and an [*audioout* modular resource](https://github.com/viam-labs/audioout) for playing sound files.
+This script is derived from the [Tipsy tutorial](https://docs.viam.com/tutorials/projects/tipsy/) but uses a custom "ghost" detector and an [*audioout* modular resource](https://github.com/viam-labs/audioout) for playing sound files.
 
 To run this:
 
@@ -16,7 +16,7 @@ To run this:
     }
 ```
 
-* Upload the ghost-detector.tflite model, and set it up as an mlmodel and vision detector
+* Upload the ghost-detector.tflite model and the labels.txt file, and set it up as an mlmodel and vision detector
 * Set environment variables (see note below)
 * run `pip3 install -r requirements.txt` in this directory
 * run `python pacbot.py`

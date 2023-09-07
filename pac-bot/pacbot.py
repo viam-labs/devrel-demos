@@ -3,7 +3,7 @@ import os
 import time
 import threading
 
-from src.audioout import Audioout
+from audioout import Audioout
 from viam.robot.client import RobotClient
 from viam.rpc.dial import Credentials, DialOptions
 from viam.components.sensor import Sensor

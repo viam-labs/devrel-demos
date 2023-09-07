@@ -17,8 +17,8 @@ To run this:
 ```
 
 * Upload the ghost-detector.tflite model, and set it up as a detector
-* On the robot, clone the audioout repository, and copy pacbot.py and the *sounds* directory into the audioout directory
 * Set environment variables (see note below)
+* run `pip3 install -r requirements.txt` in this directory
 * run `python pacbot.py`
 
 Note that the environment variables ROBOT_SECRET and ROBOT_ADDRESS are expected to be set, and there are other environment variables you may want to set - see script.

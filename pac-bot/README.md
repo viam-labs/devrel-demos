@@ -16,7 +16,7 @@ To run this:
     }
 ```
 
-* Upload the ghost-detector.tflite model, and set it up as a detector
+* Upload the ghost-detector.tflite model, and set it up as an mlmodel and vision detector
 * Set environment variables (see note below)
 * run `pip3 install -r requirements.txt` in this directory
 * run `python pacbot.py`

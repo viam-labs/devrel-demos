@@ -1,0 +1,3 @@
+speech @ git+https://github.com/viam-labs/speech.git@main
+viam-sdk
+pillow

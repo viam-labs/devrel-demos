@@ -62,7 +62,7 @@ async def detect_face(camera, detector):
 async def face_fact(classifier, photo):
     c = await classifier.get_classifications(photo, 1)
     print(c)
-    if len(c) > 0 and c[0].confidence > .5:
+    if len(c) > 0 and c[0].confidence > .75:
         print(c)
         c_spl = c[0].class_name.split('_')
         secs_ago = int(datetime.datetime.timestamp(datetime.datetime.now())) - int(c_spl[0])
@@ -190,6 +190,7 @@ async def main():
                         await speech.say("Goodbye")
                 else:
                     await speech.say("Goodbye")
+                    still_here = False
     # Don't forget to close the robot when you're done!
     await robot.close()
     await app_client.close()

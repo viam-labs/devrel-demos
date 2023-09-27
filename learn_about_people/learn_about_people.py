@@ -24,7 +24,7 @@ robot_part_id = os.getenv('ROBOT_PART') or ''
 use_completion = True
 fact_list = [
     "favorite color",
-    "favorite kind of music",
+    "favorite musician",
     "favorite science fiction robot",
     "favorite season",
     "favorite food"
@@ -55,12 +55,14 @@ async def detect_face(camera, detector):
         if detection.confidence > .75:
             im = Image.open(io.BytesIO(frame.data))
             cropped = im.crop((detection.x_min, detection.y_min, detection.x_max, detection.y_max))
+            #cropped.show()
             return cropped
     return None
 
 async def face_fact(classifier, photo):
     c = await classifier.get_classifications(photo, 1)
-    if len(c) > 0 and c[0].confidence > .9:
+    print(c)
+    if len(c) > 0 and c[0].confidence > .5:
         print(c)
         c_spl = c[0].class_name.split('_')
         secs_ago = int(datetime.datetime.timestamp(datetime.datetime.now())) - int(c_spl[0])
@@ -74,8 +76,7 @@ async def face_fact(classifier, photo):
         else:
             when = "just today"
         return { "when": when, "fact_type": c_spl[1].replace('-', ' '), "fact_value": c_spl[2].replace('-', ' ') }
-    else:
-        return None
+
 
 async def say(speech, text):
     if use_completion:
@@ -84,12 +85,19 @@ async def say(speech, text):
         said = await speech.say(text)
     return said
 
+async def push_face_image(cam, fd, images):
+    face_photo = await detect_face(cam, fd)
+    if face_photo != None:
+        buf = io.BytesIO()
+        face_photo.save(buf, format='JPEG')
+        images.append(buf.getvalue())
+    return images
+
 async def collect_fact_and_images(speech, cam, fd):
     resp = {"images": [], "fact_type": None, "fact_response": None}
 
-    face_photo = await detect_face(cam, fd)
-    if face_photo != None:
-        resp["images"].append(face_photo)
+    resp["images"] = await push_face_image(cam, fd, resp["images"])
+
     fact_type = random.choice(fact_list)
     resp["fact_type"] = fact_type
 
@@ -97,41 +105,33 @@ async def collect_fact_and_images(speech, cam, fd):
     commands = await speech.get_commands(10)
     print(commands)
     said = await say(speech, "hi, I don't think we have met, what is your " + fact_type + "'")
-    face_photo = await detect_face(cam, fd)
-    if face_photo != None:
-        resp["images"].append(face_photo)
+    resp["images"] = await push_face_image(cam, fd, resp["images"])
     time.sleep(2)
     print("will listen")
     await speech.listen_trigger('command')
     command = None
     command_check = 0
-    face_photo = await detect_face(cam, fd)
-    if face_photo != None:
-        resp["images"].append(face_photo)
+    resp["images"] = await push_face_image(cam, fd, resp["images"])
     while command == None:
-        face_photo = await detect_face(cam, fd)
-        if face_photo != None:
-            resp["images"].append(face_photo)
+        resp["images"] = await push_face_image(cam, fd, resp["images"])
         commands = await speech.get_commands(2)
         if len(commands) > 0:
             print(commands)
-            if (commands[0] == said) or (re.search(commands[0], said)):
+            if (commands[0] == said) or (len(said) > 20 and re.search(commands[0], said)):
                 if len(commands) > 1:
                     command = command[1]
             else:
                 command = commands[0]
                 await say(speech, "I like " + command + " too. Great talking to you, goodbye.")
-                time.sleep(5)
+                for x in range(0, 10):
+                    resp["images"] = await push_face_image(cam, fd, resp["images"])
                 resp["fact_response"] = command
         time.sleep(.2)
-        face_photo = await detect_face(cam, fd)
-        if face_photo != None:
-            resp["images"].append(face_photo)
+        resp["images"] = await push_face_image(cam, fd, resp["images"])
+
         command_check = command_check + 1
         if command_check == 30:
-            face_photo = await detect_face(cam, fd)
-            if face_photo != None:
-                resp["images"].append(face_photo)
+            resp["images"] = await push_face_image(cam, fd, resp["images"])
             said = await say(speech, "Sorry, I didn't hear you - what is your " + fact_type + "'")
         elif command_check == 60:
             await say(speech, "Sorry, I still did not year you, but nice to meet you")
@@ -151,29 +151,45 @@ async def main():
     cam = Camera.from_robot(robot=robot, name="cam")
 
     while True:
-        face_photo = await detect_face(cam, fd)
-        if face_photo != None:
-            print("I see a face")
-            # check if we have a fact for this face
-            fact = await face_fact(fc, face_photo)
-            if fact == None:
-                resp = await collect_fact_and_images(speech, cam, fd)
-                print("got " + str(len(resp["images"])) + " images")
-                print(resp["fact_response"])
-                if resp["fact_response"] != None and len(resp["images"]) >= 10:
-                    now = str(int(datetime.datetime.timestamp(datetime.datetime.now())))
-                    for i in resp["images"]:
-                        tags = []
-                        tag = re.sub(r'\W+', '-', (now + "_" + resp["fact_type"] + "_" + resp["fact_response"]))
-                        tags.append(tag)
-                        filename = tag + ".jpg"
-                        buf = io.BytesIO()
-                        i.save(buf, format='JPEG')
-                        await app_client.data_client.file_upload(part_id=robot_part_id, component_name="face-detector", 
-                                            file_name=filename, file_extension=".jpg", data=buf.getvalue(), tags=tags)
-            else:
-                await say(speech, "Hello again, we met " + fact["when"] + ".  I remember your " + fact["fact_type"] + " is " + fact["fact_value"])
-    
+        # check if we have a fact for this face - try 10 times so as to have higher chance of detection
+        fact = None
+        for x in range(0, 10):
+            face_photo = await detect_face(cam, fd)
+            if face_photo != None:
+                print("I see a face")
+                f = await face_fact(fc, face_photo)
+                if f != None:
+                    fact = f
+                    break
+        if fact == None:
+            resp = await collect_fact_and_images(speech, cam, fd)
+            print("got " + str(len(resp["images"])) + " images")
+            print(resp["fact_response"])
+            if resp["fact_response"] != None and len(resp["images"]) >= 10:
+                now = str(int(datetime.datetime.timestamp(datetime.datetime.now())))
+                for i in resp["images"]:
+                    tags = []
+                    tag = re.sub(r'\W+', '-', (now + "_" + resp["fact_type"] + "_" + resp["fact_response"]))
+                    tags.append(tag)
+                    filename = tag + ".jpg"
+                    await app_client.data_client.file_upload(part_id=robot_part_id, component_name="face-detector", 
+                                        file_name=filename, file_extension=".jpg", data=i, tags=tags)
+        else:
+            await say(speech, "Hello again, we met " + fact["when"] + ".  I remember your " + fact["fact_type"] + " is " + fact["fact_value"])
+            still_here = True
+            last_when = fact["when"]
+            while still_here:
+                time.sleep(1)
+                await speech.listen_trigger("completion")
+                time.sleep(20)
+                face_photo = await detect_face(cam, fd)
+                if face_photo != None:
+                    f = await face_fact(fc, face_photo)
+                    if f == None or f["when"] != last_when:
+                        still_here = False
+                        await speech.say("Goodbye")
+                else:
+                    await speech.say("Goodbye")
     # Don't forget to close the robot when you're done!
     await robot.close()
     await app_client.close()

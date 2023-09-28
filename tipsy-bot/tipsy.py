@@ -24,9 +24,12 @@ base_state = "stopped"
 
 
 async def connect():
-    creds = Credentials(type="robot-location-secret", payload=robot_secret)
+    creds = Credentials(
+        type="robot-location-secret",
+        payload=robot_secret)
     opts = RobotClient.Options(
-        refresh_interval=0, dial_options=DialOptions(credentials=creds)
+        refresh_interval=0,
+        dial_options=DialOptions(credentials=creds)
     )
     return await RobotClient.at_address(robot_address, opts)
 

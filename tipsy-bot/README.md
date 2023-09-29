@@ -1,13 +1,13 @@
 # Tipsy Bot
 
-A drink server robot using Viam platform. [Learn how it's built!](https://docs.viam.com/tutorials/projects/tipsy/)
+A drink server robot using the Viam platform. [Learn how it's built!](https://docs.viam.com/tutorials/projects/tipsy/)
 
 ## Getting Started
 
-0. Upload the `effdet0.tflite` model and the `labels.txt` file [in the app](https://app.viam.com/data/models), and set it up as an mlmodel and vision detector under the robot configuration
-0. Set environment variables (see note below)
-0. run `pip3 install -r requirements.txt` in this directory
-0. run `python tipsy.py`
+1. Upload the `effdet0.tflite` model and the `labels.txt` file [in the app](https://app.viam.com/data/models), and set it up as an mlmodel and vision detector under the robot configuration
+2. Set environment variables (see note below)
+3. run `pip3 install -r requirements.txt` in this directory
+4. run `python tipsy.py`
 
 **Required environment variables:**
 
@@ -15,7 +15,9 @@ A drink server robot using Viam platform. [Learn how it's built!](https://docs.v
 
 - `ROBOT_SECRET`
 - `ROBOT_ADDRESS`
-You can obtain the robot’s address and location secret from the app’s Code sample tab, which is both needed to send API calls to the robot from the [Viam SDKs](https://docs.viam.com/program/apis/).
+
+You can obtain the robot’s secret and address from the app’s Code sample tab, which is both needed to send API calls to the robot from the [Viam SDKs](https://docs.viam.com/program/apis/).
+
 **Optional environment variables:**
 
 - `ROBOT_BASE` (name of the `base` component in the robot configuration, defaults to `tipsy-base`)

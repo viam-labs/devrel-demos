@@ -50,6 +50,7 @@ class robot_resources:
     head = None
     claw = None
     app_client = None
+    robot = None
 
 async def robot_connect():
     creds = Credentials(type="robot-location-secret", payload=robot_secret)
@@ -222,19 +223,19 @@ async def train(tags):
     os.system(command)
 
 async def main():
-    robot = await robot_connect()
+    robot_resources.robot = await robot_connect()
     robot_resources.app_client = await viam_connect()
 
     print('Resources:')
-    print(robot.resource_names)
-    robot_resources.speech = SpeechService.from_robot(robot, name="speechio")
-    robot_resources.fd = VisionClient.from_robot(robot, name="face-detector")
-    robot_resources.fc= VisionClient.from_robot(robot, "fact-classifier")
-    robot_resources.camera = Camera.from_robot(robot=robot, name="cam")
+    print(robot_resources.robot.resource_names)
+    robot_resources.speech = SpeechService.from_robot(robot_resources.robot, name="speechio")
+    robot_resources.fd = VisionClient.from_robot(robot_resources.robot, name="face-detector")
+    robot_resources.fc= VisionClient.from_robot(robot_resources.robot, "fact-classifier")
+    robot_resources.camera = Camera.from_robot(robot=robot_resources.robot, name="cam")
 
     if use_servos:
-        robot_resources.head = Servo.from_robot(robot=robot, name="head-servo")
-        robot_resources.claw = Servo.from_robot(robot=robot, name="claw")
+        robot_resources.head = Servo.from_robot(robot=robot_resources.robot, name="head-servo")
+        robot_resources.claw = Servo.from_robot(robot=robot_resources.robot, name="claw")
 
     while True:
         face_photo = await detect_face()
@@ -265,14 +266,16 @@ async def main():
                         still_here = True
                     else:
                         still_here = False
-    # Don't forget to close the robot when you're done!
-    await robot.close()
-    await app_client.close()
+
+async def close():
+    await robot_resources.robot.close()
+    await robot_resources.app_client.close()
 
 if __name__ == '__main__':
     # a hack to just keep re-spawning on any errors encountered (like disconnect from robot)
     try:
         asyncio.run(main())
     except:
+        asyncio.run(close())
         asyncio.run(main())
 

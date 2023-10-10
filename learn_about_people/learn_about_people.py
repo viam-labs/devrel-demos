@@ -250,7 +250,6 @@ async def main():
                 if tag != None:
                     tags = await get_tags_for_training()
                     print(tags)
-                    tags.append(tag)
                     await train(tags)
             else:
                 # interact regarding previous encounter and learnings

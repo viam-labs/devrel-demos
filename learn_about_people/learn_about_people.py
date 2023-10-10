@@ -15,16 +15,24 @@ from viam.rpc.dial import Credentials, DialOptions
 from viam.components.camera import Camera
 from viam.components.servo import Servo
 from viam.services.vision import VisionClient
+from google.protobuf.timestamp_pb2 import Timestamp
 
 # these must be set, you can get them from your robot's 'CODE SAMPLE' tab
 robot_secret = os.getenv('ROBOT_SECRET') or ''
 robot_address = os.getenv('ROBOT_ADDRESS') or ''
 robot_part_id = os.getenv('ROBOT_PART') or ''
+org_id = os.getenv('ROBOT_ORG_ID') or ''
+sdk_path = os.getenv('RDK_PATH') or ''
+
+model_name = 'facts'
 
 # if set to false, will just repeat the wording passed in
 use_completion = True
 # use servos for "head" tracking and claw movement
 use_servos = True
+face_confidence =  .75
+fact_confidence = .6
+tag_days = 1
 
 fact_list = [
     "favorite color",
@@ -41,6 +49,7 @@ class robot_resources:
     camera = None
     head = None
     claw = None
+    app_client = None
 
 async def robot_connect():
     creds = Credentials(type="robot-location-secret", payload=robot_secret)
@@ -64,7 +73,7 @@ async def detect_face():
     if len(detections) == 1:
         # for now only look for a single face, as it might be hard to manage multiple
         detection = detections[0]
-        if detection.confidence > .75:
+        if detection.confidence > face_confidence:
             im = frame
             cropped = im.crop((detection.x_min, detection.y_min, detection.x_max, detection.y_max))
             #cropped.show()
@@ -88,8 +97,7 @@ async def track_face(im, detection):
 
 async def face_fact(photo):
     c = await robot_resources.fc.get_classifications(photo, 1)
-    print(c)
-    if len(c) > 0 and c[0].confidence > .9:
+    if len(c) > 0 and c[0].confidence > fact_confidence:
         print(c)
         c_spl = c[0].class_name.split('_')
         secs_ago = int(datetime.datetime.timestamp(datetime.datetime.now())) - int(c_spl[0])
@@ -133,7 +141,7 @@ async def collect_fact_and_images():
     print(commands)
     said = await say("hi, I don't think we have met, what is your " + fact_type + "'")
     resp["images"] = await push_face_image(resp["images"])
-    time.sleep(2)
+    time.sleep(3)
     print("will listen")
     await robot_resources.speech.listen_trigger('command')
     command = None
@@ -161,6 +169,7 @@ async def collect_fact_and_images():
         if command_check == 20:
             resp["images"] = await push_face_image(resp["images"])
             said = await say("Sorry, I didn't hear you - what is your " + fact_type + "'")
+            await robot_resources.speech.listen_trigger('command')
         elif command_check == 40:
             await say("Sorry, I still did not year you, but nice to meet you")
             break
@@ -179,18 +188,38 @@ async def move_claw(angle, wait):
     await robot_resources.claw.move(0)
     time.sleep(.5)
 
+async def get_tags_for_training():
+    # first get tags
+    tags = await robot_resources.app_client.data_client.tags_by_filter()
+    filtered_tags = []
+    # then, get tags with 10 or more images
+    for t in tags:
+        if re.match("\w+_[\w-]+_\w+",t):
+            start = Timestamp(seconds=int(datetime.datetime.timestamp(datetime.datetime.now()))- (86400 * tag_days))
+            images = await robot_resources.app_client.data_client.binary_data_by_filter(include_file_data=False, filter={'interval': {'start': start}, 'tags_filter': {'tags': [t]}})
+            if len(images) >= 10:
+                filtered_tags.append(t)
+    return filtered_tags
+
 async def send_images(resp):
     print("got " + str(len(resp["images"])) + " images")
     print(resp["fact_response"])
     if resp["fact_response"] != None and len(resp["images"]) >= 10:
         now = str(int(datetime.datetime.timestamp(datetime.datetime.now())))
+        tag = re.sub(r'\W+', '-', (now + "_" + resp["fact_type"] + "_" + resp["fact_response"]))
+        tags = []
+        tags.append(tag)
         for i in resp["images"]:
-            tags = []
-            tag = re.sub(r'\W+', '-', (now + "_" + resp["fact_type"] + "_" + resp["fact_response"]))
-            tags.append(tag)
             filename = tag + ".jpg"
             await robot_resources.app_client.data_client.file_upload(part_id=robot_part_id, component_name="face-detector", 
                                 file_name=filename, file_extension=".jpg", data=i, tags=tags)
+        return tag
+
+async def train(tags):
+    tags = ','.join(tags)
+    command = f'cd {sdk_path}; go run cli/viam/main.go train submit --model-org-id={org_id} --model-name={model_name} --model-type=single_label_classification --model-labels={tags} --tags={tags}  --org-ids={org_id} --mime-types=image/jpeg,image/png'
+    print(command)
+    os.system(command)
 
 async def main():
     robot = await robot_connect()
@@ -216,7 +245,13 @@ async def main():
                 # interact and collect images to retrain model
                 asyncio.ensure_future(move_claw(10, 1))
                 resp = await collect_fact_and_images()
-                await send_images(resp)
+                tag = await send_images(resp)
+                print(tag)
+                if tag != None:
+                    tags = await get_tags_for_training()
+                    print(tags)
+                    tags.append(tag)
+                    await train(tags)
             else:
                 # interact regarding previous encounter and learnings
                 asyncio.ensure_future(move_claw(25, .2))

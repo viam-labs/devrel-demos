@@ -6,6 +6,7 @@ from viam.rpc.dial import Credentials, DialOptions
 from viam.components.sensor import Sensor
 from viam.components.base import Base
 from viam.services.vision import VisionClient
+from viam.services.seensors import SensorsClient
 
 robot_secret = os.getenv("ROBOT_SECRET") or ""
 robot_address = os.getenv("ROBOT_ADDRESS") or ""
@@ -34,13 +35,8 @@ async def connect():
     return await RobotClient.at_address(robot_address, opts)
 
 
-async def obstacle_detect(sensor: Sensor):
-    reading = (await sensor.get_readings())["distance"]
-    return reading
-
-
-async def gather_obstacle_readings(sensors: list[Sensor]):
-    return await asyncio.gather(*[obstacle_detect(sensor) for sensor in sensors])
+async def get_obstacle_readings(sensors: list[Sensor]):
+    return await [r["distance"] for r in sensors_svc.get_readings(sensors)]
 
 
 async def obstacle_detect_loop(sensors: list[Sensor], base: Base):
@@ -69,7 +65,7 @@ async def person_detect(detector: VisionClient, sensors: list[Sensor], base: Bas
         if found:
             print("I see a person")
             # first manually call obstacle_detect - don't even start moving if someone is in the way
-            distances = await gather_obstacle_readings(sensors)
+            distances = await get_obstacle_readings(sensors)
             if all(distance > 0.4 for distance in distances):
                 print("will move straight")
                 base_state = "straight"
@@ -87,7 +83,8 @@ async def person_detect(detector: VisionClient, sensors: list[Sensor], base: Bas
 async def main():
     robot = await connect()
     base = Base.from_robot(robot, base_name)
-    sensors = [Sensor.from_robot(robot, sensor_name) for sensor_name in sensor_names]
+    sensors_svc = SensorsClient.from_robot(robot=robot, name="builtin")
+    sensors = await sensors_svc.get_sensors()
     detector = VisionClient.from_robot(robot, "myPeopleDetector")
 
     # create a background task that looks for obstacles and stops the base if its moving

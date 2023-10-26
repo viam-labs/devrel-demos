@@ -34,13 +34,13 @@ async def connect():
     return await RobotClient.at_address(robot_address, opts)
 
 
-async def get_obstacle_readings(sensors: list[Sensor]):
+async def get_obstacle_readings(sensors_svc, sensors: list[Sensor]):
     return await [r["distance"] for r in sensors_svc.get_readings(sensors)]
 
 
-async def obstacle_detect_loop(sensors: list[Sensor], base: Base):
+async def obstacle_detect_loop(sensors_svc, sensors: list[Sensor], base: Base):
     while True:
-        distances = await get_obstacle_readings(sensors)
+        distances = await get_obstacle_readings(sensors_svc, sensors)
         if any(distance < 0.4 for distance in distances):
             # stop the base if moving straight
             if base_state == "straight":
@@ -49,7 +49,7 @@ async def obstacle_detect_loop(sensors: list[Sensor], base: Base):
         await asyncio.sleep(0.01)
 
 
-async def person_detect(detector: VisionClient, sensors: list[Sensor], base: Base):
+async def person_detect(detector: VisionClient, sensors_svc, sensors: list[Sensor], base: Base):
     while True:
         # look for person
         found = False
@@ -64,7 +64,7 @@ async def person_detect(detector: VisionClient, sensors: list[Sensor], base: Bas
         if found:
             print("I see a person")
             # first manually call obstacle_detect - don't even start moving if someone is in the way
-            distances = await get_obstacle_readings(sensors)
+            distances = await get_obstacle_readings(sensors_svc, sensors)
             if all(distance > 0.4 for distance in distances):
                 print("will move straight")
                 base_state = "straight"
@@ -87,9 +87,9 @@ async def main():
     detector = VisionClient.from_robot(robot, "myPeopleDetector")
 
     # create a background task that looks for obstacles and stops the base if its moving
-    obstacle_task = asyncio.create_task(obstacle_detect_loop(sensors, base))
+    obstacle_task = asyncio.create_task(obstacle_detect_loop(sensors_svc, sensors, base))
     # create a background task that looks for a person and moves towards them, or turns and keeps looking
-    person_task = asyncio.create_task(person_detect(detector, sensors, base))
+    person_task = asyncio.create_task(person_detect(detector, sensors_svc, sensors, base))
     results = await asyncio.gather(obstacle_task, person_task, return_exceptions=True)
     print(results)
 

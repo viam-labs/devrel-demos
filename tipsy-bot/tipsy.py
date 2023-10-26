@@ -6,7 +6,7 @@ from viam.rpc.dial import Credentials, DialOptions
 from viam.components.sensor import Sensor
 from viam.components.base import Base
 from viam.services.vision import VisionClient
-from viam.services.seensors import SensorsClient
+from viam.services.sensors import SensorsClient
 
 robot_secret = os.getenv("ROBOT_SECRET") or ""
 robot_address = os.getenv("ROBOT_ADDRESS") or ""

@@ -15,7 +15,6 @@ base_name = os.getenv("ROBOT_BASE") or "tipsy-base"
 # change this if you named your camera differently in your robot configuration
 camera_name = os.getenv("ROBOT_CAMERA") or "cam"
 # change this if you named your sensors differently in your robor configuration
-sensor_names = (os.getenv("ROBOT_SENSORS") or "ultrasonic,ultrasonic2").split(",")
 pause_interval = os.getenv("PAUSE_INTERVAL") or 3
 
 if isinstance(pause_interval, str):

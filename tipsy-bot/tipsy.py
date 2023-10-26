@@ -40,7 +40,7 @@ async def get_obstacle_readings(sensors: list[Sensor]):
 
 async def obstacle_detect_loop(sensors: list[Sensor], base: Base):
     while True:
-        distances = await gather_obstacle_readings(sensors)
+        distances = await get_obstacle_readings(sensors)
         if any(distance < 0.4 for distance in distances):
             # stop the base if moving straight
             if base_state == "straight":

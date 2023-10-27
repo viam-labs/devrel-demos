@@ -82,7 +82,7 @@ async def person_detect(detector: VisionClient, sensors_svc, sensors: list[Senso
 async def main():
     robot = await connect()
     base = Base.from_robot(robot, base_name)
-    sensors_svc = SensorsClient.from_robot(robot=robot, name="builtin")
+    sensors_svc = SensorsClient.from_robot(robot=robot)
     sensors = await sensors_svc.get_sensors()
     detector = VisionClient.from_robot(robot, "myPeopleDetector")
 

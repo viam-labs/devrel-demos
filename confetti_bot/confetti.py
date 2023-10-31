@@ -5,18 +5,18 @@ from viam.components.board import Board
 from viam.components.motor import Motor
 from viam.rpc.dial import Credentials, DialOptions
 
-ROBOT_URL = 'confettibot-main.x1xrwbxtpr.local.viam.cloud:8080' #'PUT YOUR URL HERE!!!'
-ROBOT_SECRET = 'oxqymrmvwovbp63yohjm9nxgva1r07nzw9f2sw4bsnrka5gp' #'PUT YOUR SECRET HERE!!!'
+robot_api_key = os.getenv('ROBOT_API_KEY') or ''
+robot_api_key_id = os.getenv('ROBOT_API_KEY_ID') or ''
+robot_address = os.getenv('ROBOT_ADDRESS') or ''
+
 
 async def connect():
-    creds = Credentials(
-        type='robot-location-secret',
-        payload=ROBOT_SECRET)
-    opts = RobotClient.Options(
-        refresh_interval=0,
-        dial_options=DialOptions(credentials=creds)
+    opts = RobotClient.Options.with_api_key(
+      api_key=robot_api_key,
+      api_key_id=robot_api_key_id
     )
-    return await RobotClient.at_address(ROBOT_URL, opts)
+    return await RobotClient.at_address(robot_address, opts)
+
 
 async def main():
     robot = await connect()

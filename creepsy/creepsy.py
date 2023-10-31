@@ -1,7 +1,7 @@
 import asyncio
 import os
 
-from audioout import Audioout
+from audioout_python import Audioout
 from viam.robot.client import RobotClient
 from viam.rpc.dial import Credentials, DialOptions
 from viam.components.sensor import Sensor
@@ -14,10 +14,13 @@ robot_address = os.getenv('ROBOT_ADDRESS') or ''
 base_name = os.getenv('ROBOT_BASE') or 'creepsy-base'
 #change this if you named your camera differently in your robot configuration
 camera_name = os.getenv('ROBOT_CAMERA') or 'cam'
-# change this if you named your sensors differently in your robor configuration
+# change this if you named your sensors differently in your robot configuration
 sensor_names = (os.getenv("ROBOT_SENSORS") or "ultrasonic,ultrasonic2").split(",")
+# change this if you named your detector differently in your robot configuration
+detector_name = os.getenv('DETECTOR_NAME') or 'myPeopleDetector'
+# change this if you named your audioout service differently in your robot configuration
+audioout_name = os.getenv('AUDIOOUT_NAME') or 'audioout'
 pause_interval = os.getenv('PAUSE_INTERVAL') or 3
-detector_name = os.getenv('DETECTOR_NAME') or 'people-detector'
 chase_label = os.getenv('CHASE_LABEL') or 'person'
 
 if isinstance(pause_interval, str):
@@ -78,7 +81,7 @@ async def person_detect(detector: VisionClient, sensors: list[Sensor], base: Bas
         
         if (action == "chase"):
             await stop_sound(ao)
-            await play_sound(ao, 'creepy-horror-sound-possessed-2-laughter-vol-001-167400.mp3', 10, False)
+            await play_sound(ao, 'possessed-laughter.mp3', 10, False)
             print("I have to chase the person")
             # first manually call obstacle_detect - don't even start moving if something is in the way
             distances = await gather_obstacle_readings(sensors)
@@ -89,7 +92,7 @@ async def person_detect(detector: VisionClient, sensors: list[Sensor], base: Bas
                 base_state = "stopped"
         else:
             await stop_sound(ao)
-            await play_sound(ao, 'spooky-halloween-effects-with-thunder-121665.mp3', 0, False)
+            await play_sound(ao, 'spooky-thunder.mp3', 0, False)
             print("I will turn and look for a person")
             base_state = "spinning"
             await base.spin(45, 45)
@@ -103,10 +106,10 @@ async def main():
     base = Base.from_robot(robot, base_name)
     sensors = [Sensor.from_robot(robot, sensor_name) for sensor_name in sensor_names]
     detector = VisionClient.from_robot(robot, detector_name)
-    ao = Audioout.from_robot(robot, name="audioout")
+    ao = Audioout.from_robot(robot, audioout_name)
 
     await stop_sound(ao)
-    await play_sound(ao, 'Free - Scream 7.mp3', 0, True)
+    await play_sound(ao, 'scream.mp3', 0, True)
 
     # create a background task that looks for obstacles and stops the base if its moving
     obstacle_task = asyncio.create_task(obstacle_detect_loop(sensors, base))

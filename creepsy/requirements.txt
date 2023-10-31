@@ -1,1 +1,1 @@
-audioout @ git+https://github.com/viam-labs/audioout.git@main
+audioout_api @ git+https://github.com/viam-labs/audioout-api.git@main

@@ -13,6 +13,16 @@ To run this:
       "model": "viam-labs:audioout:pygame"
     }
 ```
+* Install the prerequisites to your Raspberry Pi:
+
+``` bash
+sudo apt update && sudo apt upgrade -y
+sudo apt-get install python3
+sudo apt install python3-pip
+sudo apt install python3-pyaudio
+sudo apt-get install alsa-tools alsa-utils
+sudo apt-get install flac
+```
 
 * Upload the effdet0.tflite model and the labels.txt file, and set it up as an mlmodel and vision detector
 * Set environment variables (see note below)
@@ -33,4 +43,6 @@ You can obtain the robot’s secret and address from the app’s Code sample tab
 - `ROBOT_BASE` (name of the `base` component in the robot configuration, defaults to `creepsy-base`)
 - `ROBOT_CAMERA` (name of the `camera` component in the robot configuration, defaults to `cam`)
 - `ROBOT_SENSORS` (names of the ultrasonic `sensor` components in the robot configuration as a comma-separated list, defaults to `ultrasonic,ultrasonic2`)
+- `DETECTOR_NAME` (name of the `detector` in the robot configuration, defaults to `people-detector`)
 - `PAUSE_INTERVAL` (number of seconds to wait between searching for people to serve, defaults to 3)
+- `CHASE_LABEL`(label of the object you are following, defaults to person)

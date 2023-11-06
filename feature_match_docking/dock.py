@@ -14,7 +14,7 @@ from viam.services.vision import VisionClient
 robot_secret = os.getenv('ROBOT_SECRET') or ''
 robot_address = os.getenv('ROBOT_ADDRESS') or ''
 velocity = 35
-precise_spin = 2
+precise_spin = 1
 big_spin = 6
 normal_sleep = .1
 
@@ -53,7 +53,7 @@ async def main():
             print(centered, relative_size)
     
             # try to get it more centered
-            if abs(centered) > .04:
+            if abs(centered) > .12:
                 if centered > 0:
                     await robot_resources.base.spin(precise_spin, -velocity)
                 else:

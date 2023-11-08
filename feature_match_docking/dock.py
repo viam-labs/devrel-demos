@@ -13,11 +13,12 @@ from viam.services.vision import VisionClient
 # these must be set, you can get them from your robot's 'CODE SAMPLE' tab
 robot_secret = os.getenv('ROBOT_SECRET') or ''
 robot_address = os.getenv('ROBOT_ADDRESS') or ''
-velocity = 35
-precise_spin = 1
-big_spin = 6
-normal_sleep = .1
-
+velocity = 80
+precise_spin = 4
+big_spin = 10
+normal_sleep = .02
+straight_distance = 12
+center_tolerance = .07
 class robot_resources:
     robot = None
     dock_detector = None
@@ -53,16 +54,16 @@ async def main():
             print(centered, relative_size)
     
             # try to get it more centered
-            if abs(centered) > .12:
+            if abs(centered) > center_tolerance:
                 if centered > 0:
                     await robot_resources.base.spin(precise_spin, -velocity)
                 else:
                     await robot_resources.base.spin(precise_spin,velocity)
             else:
-               await robot_resources.base.move_straight(10,velocity)
+               await robot_resources.base.move_straight(straight_distance,velocity)
             if relative_size > .55:
                 docked = True
-            sleep = .5
+            sleep = .07
         else:
             detection_tries = detection_tries + 1
             if detection_tries == 3:
@@ -71,6 +72,14 @@ async def main():
                 detection_tries = 0
         time.sleep(sleep)
     
+    # finish by one big forward movement then a wiggle to make sure attached to dock
+    robot_resources.base.move_straight(150,velocity*2)
+    await robot_resources.base.spin(big_spin*2, velocity)
+    await robot_resources.base.spin(big_spin*2, -velocity)
+    await robot_resources.base.spin(big_spin*2, velocity)
+    await robot_resources.base.spin(big_spin*2, -velocity)
+    await robot_resources.base.move_straight(50,velocity*2)
+    await robot_resources.base.move_straight(40,-velocity*2)
 
     await robot_resources.robot.close()
 

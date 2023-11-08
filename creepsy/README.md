@@ -25,6 +25,7 @@ To run this:
 
 - `ROBOT_API_KEY`
 - `ROBOT_API_KEY_ID`
+- `ROBOT_ADDRESS`
 
 You can obtain the robot’s api key, api key id, and address from the app’s Code sample tab, which is both needed to send API calls to the robot from the [Viam SDKs](https://docs.viam.com/program/apis/).
 

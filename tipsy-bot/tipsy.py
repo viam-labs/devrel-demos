@@ -8,7 +8,8 @@ from viam.components.base import Base
 from viam.services.vision import VisionClient
 from viam.services.sensors import SensorsClient
 
-robot_secret = os.getenv("ROBOT_SECRET") or ""
+robot_api_key = os.getenv('ROBOT_API_KEY') or ''
+robot_api_key_id = os.getenv('ROBOT_API_KEY_ID') or ''
 robot_address = os.getenv("ROBOT_ADDRESS") or ""
 # change this if you named your base differently in your robot configuration
 base_name = os.getenv("ROBOT_BASE") or "tipsy-base"
@@ -28,12 +29,9 @@ base_state = "stopped"
 
 
 async def connect():
-    creds = Credentials(
-        type="robot-location-secret",
-        payload=robot_secret)
-    opts = RobotClient.Options(
-        refresh_interval=0,
-        dial_options=DialOptions(credentials=creds)
+    opts = RobotClient.Options.with_api_key(
+      api_key=robot_api_key,
+      api_key_id=robot_api_key_id
     )
     return await RobotClient.at_address(robot_address, opts)
 

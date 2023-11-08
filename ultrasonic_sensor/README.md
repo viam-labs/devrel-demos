@@ -22,4 +22,4 @@ It expects an ultrasonic sensor to be attached to a Raspberry Pi, pin 40 for tri
 }
 ```
 
-Note that the environment variables ROBOT_SECRET and ROBOT_ADDRESS are expected to be set.
+Note that the environment variables ROBOT_API_KEY, ROBOT_API_KEY_ID, and ROBOT_ADDRESS are expected to be set.

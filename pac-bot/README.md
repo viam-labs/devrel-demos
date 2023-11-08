@@ -21,4 +21,4 @@ To run this:
 * run `pip3 install -r requirements.txt` in this directory
 * run `python pacbot.py`
 
-Note that the environment variables ROBOT_SECRET and ROBOT_ADDRESS are expected to be set, and there are other environment variables you may want to set - see script.
+Note that the environment variables ROBOT_API_KEY, ROBOT_API_KEY_ID, and ROBOT_ADDRESS are expected to be set, and there are other environment variables you may want to set - see script.

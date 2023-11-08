@@ -1,4 +1,4 @@
-# Creepsy! 
+# Creepsy!
 A scary drink server robot using the Viam platform. This script is derived from the [Tipsy tutorial](https://docs.viam.com/tutorials/projects/tipsy/) but uses an [*audioout* modular resource](https://github.com/viam-labs/audioout) to play scary sound files.
 
 To run this:
@@ -23,10 +23,10 @@ To run this:
 
 [Learn about authenticating with the Viam SDK](https://docs.viam.com/program/run/#authentication).
 
-- `ROBOT_SECRET`
-- `ROBOT_ADDRESS`
+- `ROBOT_API_KEY`
+- `ROBOT_API_KEY_ID`
 
-You can obtain the robot’s secret and address from the app’s Code sample tab, which is both needed to send API calls to the robot from the [Viam SDKs](https://docs.viam.com/program/apis/).
+You can obtain the robot’s api key, api key id, and address from the app’s Code sample tab, which is both needed to send API calls to the robot from the [Viam SDKs](https://docs.viam.com/program/apis/).
 
 **Optional environment variables:**
 

@@ -13,14 +13,16 @@ A drink server robot using the Viam platform. [Learn how it's built!](https://do
 
 [Learn about authenticating with the Viam SDK](https://docs.viam.com/program/run/#authentication).
 
-- `ROBOT_SECRET`
+- `ROBOT_API_KEY`
+- `ROBOT_API_KEY_ID`
 - `ROBOT_ADDRESS`
 
-You can obtain the robot’s secret and address from the app’s Code sample tab, which is both needed to send API calls to the robot from the [Viam SDKs](https://docs.viam.com/program/apis/).
+You can obtain the robot’s api key and api key id and address from the app’s Code sample tab, which is both needed to send API calls to the robot from the [Viam SDKs](https://docs.viam.com/program/apis/).
 
 **Optional environment variables:**
 
 - `ROBOT_BASE` (name of the `base` component in the robot configuration, defaults to `tipsy-base`)
 - `ROBOT_CAMERA` (name of the `camera` component in the robot configuration, defaults to `cam`)
-- `ROBOT_SENSORS` (names of the ultrasonic `sensor` components in the robot configuration as a comma-separated list, defaults to `ultrasonic,ultrasonic2`)
+- `ROBOT_DETECTOR` (name of the detector in the robot configuration, defaults to `myPeopleDetector`)
+- `ROBOT_SENSORS` (names of the `sensor` service in the robot configuration, defaults to `sensors`)
 - `PAUSE_INTERVAL` (number of seconds to wait between searching for people to serve, defaults to 3)

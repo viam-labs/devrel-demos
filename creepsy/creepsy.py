@@ -17,7 +17,7 @@ camera_name = os.getenv('ROBOT_CAMERA') or 'cam'
 # change this if you named your sensors differently in your robot configuration
 sensor_names = (os.getenv("ROBOT_SENSORS") or "ultrasonic,ultrasonic2").split(",")
 # change this if you named your detector differently in your robot configuration
-detector_name = os.getenv('DETECTOR_NAME') or 'myPeopleDetector'
+detector_name = os.getenv('ROBOT_DETECTOR') or 'myPeopleDetector'
 # change this if you named your audioout service differently in your robot configuration
 audioout_name = os.getenv('AUDIOOUT_NAME') or 'audioout'
 pause_interval = os.getenv('PAUSE_INTERVAL') or 3

@@ -18,7 +18,7 @@ precise_spin = 4
 big_spin = 10
 normal_sleep = .02
 straight_distance = 12
-center_tolerance = .07
+center_tolerance = .05
 class robot_resources:
     robot = None
     dock_detector = None

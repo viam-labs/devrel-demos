@@ -88,7 +88,7 @@ async def main():
     robot = await connect()
     base = Base.from_robot(robot, base_name)
     sensors = [Sensor.from_robot(robot, sensor_name) for sensor_name in sensor_names]
-    detector = VisionClient.from_robot(robot, "myPeopleDetector")
+    detector = VisionClient.from_robot(robot, name=detector_name)
 
     # create a background task that looks for obstacles and stops the base if its moving
     obstacle_task = asyncio.create_task(obstacle_detect_loop(sensors, base))
